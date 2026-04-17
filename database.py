@@ -29,8 +29,10 @@ class Database:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.execute("PRAGMA foreign_keys = ON")
+        self.conn.execute("PRAGMA synchronous = NORMAL")  # 提高写入性能
         self.cursor = self.conn.cursor()
         self.init_tables()
+        self.create_indexes()  # 创建索引优化查询性能
     
     def init_tables(self):
         """初始化数据库表"""
@@ -103,6 +105,9 @@ class Database:
 
         self.conn.commit()
         
+        # 创建索引优化查询性能
+        self.create_indexes()
+        
         # 数据库迁移：添加缺失的列
         self.migrate_database()
         
@@ -161,6 +166,39 @@ class Database:
             self.conn.commit()
         except Exception as e:
             print(f"数据库迁移失败: {e}")
+    
+    def create_indexes(self):
+        """创建索引优化查询性能"""
+        try:
+            # accounts表索引
+            indexes = [
+                ("idx_accounts_user_id", "CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON accounts(user_id)"),
+                ("idx_accounts_date", "CREATE INDEX IF NOT EXISTS idx_accounts_date ON accounts(date)"),
+                ("idx_accounts_type", "CREATE INDEX IF NOT EXISTS idx_accounts_type ON accounts(type)"),
+                ("idx_accounts_user_date", "CREATE INDEX IF NOT EXISTS idx_accounts_user_date ON accounts(user_id, date)"),
+                ("idx_accounts_deleted", "CREATE INDEX IF NOT EXISTS idx_accounts_deleted ON accounts(deleted_at)"),
+                
+                # categories表索引
+                ("idx_categories_user_id", "CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)"),
+                ("idx_categories_type", "CREATE INDEX IF NOT EXISTS idx_categories_type ON categories(type)"),
+                
+                # payment_methods表索引
+                ("idx_payment_methods_user_id", "CREATE INDEX IF NOT EXISTS idx_payment_methods_user_id ON payment_methods(user_id)"),
+                
+                # handlers表索引
+                ("idx_handlers_user_id", "CREATE INDEX IF NOT EXISTS idx_handlers_user_id ON handlers(user_id)"),
+            ]
+            
+            for name, sql in indexes:
+                try:
+                    self.cursor.execute(sql)
+                except Exception as e:
+                    print(f"创建索引 {name} 失败: {e}")
+            
+            self.conn.commit()
+            print("数据库索引创建完成")
+        except Exception as e:
+            print(f"创建索引失败: {e}")
     
     def _assign_sort_order_to_categories(self):
         """为现有分类分配排序顺序（按名称字母顺序）"""

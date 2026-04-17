@@ -143,7 +143,7 @@ class MainFrame(wx.Frame):
             set_language(saved_lang)
         
         self.current_lang = get_current_language()
-        title = f"{get_text('家庭记账系统')} v0.1 - {user['username']}"
+        title = f"{get_text('家庭记账系统')} v0.2 - {user['username']}"
         super().__init__(None, title=title, size=(1000, 650))
         
         # 设置窗口图标
@@ -294,7 +294,7 @@ class MainFrame(wx.Frame):
         """刷新界面文字"""
         try:
             # 更新标题
-            self.SetTitle(f"{get_text('家庭记账系统')} v0.1 - {self.user['username']}")
+            self.SetTitle(f"{get_text('家庭记账系统')} v0.2 - {self.user['username']}")
 
             # 更新状态栏
             self.SetStatusText(f"{get_text('当前账户')}: {self.user['username']}")
@@ -489,7 +489,7 @@ class MainFrame(wx.Frame):
                     self.import_export_panel.user_id = self.user_id
                     self.import_export_panel.db = self.db
                     # 刷新界面
-                    self.SetTitle(f"{get_text('家庭记账系统')} v0.1 - {new_user['username']}")
+                    self.SetTitle(f"{get_text('家庭记账系统')} v0.2 - {new_user['username']}")
                     self.SetStatusText(f"{get_text('当前账户')}: {self.user['username']}", 0)
                     self.refresh_accounts()
                     wx.MessageBox(f"{get_text('已切换到账户')}: {username}", get_text('提示'), wx.OK | wx.ICON_INFORMATION)
@@ -700,7 +700,7 @@ class AboutDialog(wx.Dialog):
         title_label.SetFont(title_font)
         name_sizer.Add(title_label, flag=wx.LEFT, border=10)
         
-        version_label = wx.StaticText(panel, label="版本 0.1")
+        version_label = wx.StaticText(panel, label=get_text('版本')+' 0.2')
         version_font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         version_label.SetFont(version_font)
         name_sizer.Add(version_label, flag=wx.LEFT, border=10)
@@ -770,10 +770,15 @@ class AboutDialog(wx.Dialog):
         # 更新页
         update_panel = wx.Panel(self.notebook)
         update_sizer = wx.BoxSizer(wx.VERTICAL)
-        update_text = wx.StaticText(update_panel, label="\n2026-04-10 v0.1版发布")
-        update_sizer.Add(update_text, flag=wx.ALL, border=10)
+        
+        # 更新日志文本框（不可编辑）
+        self.update_log_text = wx.TextCtrl(update_panel, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP, size=(400, 250))
+        update_sizer.Add(self.update_log_text, proportion=1, flag=wx.EXPAND | wx.ALL, border=10)
         update_panel.SetSizer(update_sizer)
         self.notebook.AddPage(update_panel, get_text('更新'))
+        
+        # 加载update_log.txt文件
+        self.load_update_log_file()
         
         # 添加i18n支持
         from i18n import add_language_listener
@@ -821,6 +826,17 @@ class AboutDialog(wx.Dialog):
             self.license_text.SetValue("LICENSE.txt 文件未找到")
         except Exception as e:
             self.license_text.SetValue(f"加载 LICENSE.txt 失败: {str(e)}")
+    
+    def load_update_log_file(self):
+        """加载update_log.txt文件"""
+        try:
+            with open("update_log.txt", "r", encoding="utf-8") as f:
+                content = f.read()
+            self.update_log_text.SetValue(content)
+        except FileNotFoundError:
+            self.update_log_text.SetValue("update_log.txt 文件未找到")
+        except Exception as e:
+            self.update_log_text.SetValue(f"加载 update_log.txt 失败: {str(e)}")
     
     def on_language_changed(self):
         """语言切换回调"""

@@ -20,7 +20,7 @@ class LoginDialog(wx.Dialog):
             set_language(saved_lang)
         
         self.current_lang = get_current_language()
-        super().__init__(parent, title=get_text('家庭记账系统') + " v0.1 - " + get_text('登录'), size=(380, 340))
+        super().__init__(parent, title=get_text('家庭记账系统') + " v0.2 - " + get_text('登录'), size=(380, 340))
         
         # 设置窗口图标
         try:
@@ -228,7 +228,7 @@ class LoginDialog(wx.Dialog):
             # 直接使用 self.current_lang 获取翻译
             lang = self.current_lang
             
-            self.SetTitle(get_text('家庭记账系统', lang) + " v0.1 - " + get_text('登录', lang))
+            self.SetTitle(get_text('家庭记账系统', lang) + " v0.2 - " + get_text('登录', lang))
             self.title.SetLabel(get_text('家庭记账系统', lang))
             self.user_label.SetLabel(get_text('账户', lang) + ":")
             self.pwd_label.SetLabel(get_text('密码', lang) + ":")

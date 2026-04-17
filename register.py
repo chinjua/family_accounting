@@ -43,6 +43,7 @@ class RegisterDialog(wx.Dialog, LanguageSupportMixin):
     def apply_theme(self):
         """应用当前主题"""
         from theme import apply_theme_to_window
+        from config_manager import config
         theme = get_theme()
         self.SetBackgroundColour(theme['bg_color'])
         # 递归应用主题到所有控件（包括按钮）
